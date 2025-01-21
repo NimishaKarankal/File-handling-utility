@@ -1,6 +1,12 @@
 # File-handling-utility
 
-
+Project Details:
+Name: Nimisha Karankal
+Company Name: CODTECH IT SOLUTIONS
+Intern ID: CT08GJI
+Domain: Java Programming 
+Mentor: Neela Santhosh
+Batch Duration: 25th December 2024 to 25th January 2025
 
 #### Overview:
 The **File Handling Utility** is a straightforward yet practical Java program that allows users to perform essential operations on text files. It simplifies the process of creating, reading, and modifying files through a command-line interface. The program is particularly useful for developers or students learning file handling in Java, as it demonstrates how to use built-in classes like `FileWriter`, `FileReader`, `BufferedWriter`, and `BufferedReader` effectively.
