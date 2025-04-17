@@ -1,82 +1,119 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.*;
-import java.util.Scanner;
 
-public class FileHandler {
+public class FileHandlerGUI extends JFrame {
 
-    // Method to create and write to a text file
-    public static void writeFile(String fileName, String content) {
-        if (fileName.trim().isEmpty()) {
-        System.out.println("File name cannot be blank.");
-        return;
+    private JTextField fileNameField;
+    private JTextArea fileContentArea;
+    private JTextArea appendContentArea;
+    private JButton writeButton, readButton, modifyButton;
+
+    public FileHandlerGUI() {
+        setTitle("File Handling Utility");
+        setSize(600, 600);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // Top Panel: File name input
+        JPanel topPanel = new JPanel(new FlowLayout());
+        topPanel.add(new JLabel("File Name:"));
+        fileNameField = new JTextField(30);
+        topPanel.add(fileNameField);
+        add(topPanel, BorderLayout.NORTH);
+
+        // Center Panel: Content Area
+        JPanel centerPanel = new JPanel(new GridLayout(2, 1));
+
+        fileContentArea = new JTextArea(10, 50);
+        fileContentArea.setBorder(BorderFactory.createTitledBorder("Content to Write / Current File Content"));
+        centerPanel.add(new JScrollPane(fileContentArea));
+
+        appendContentArea = new JTextArea(5, 50);
+        appendContentArea.setBorder(BorderFactory.createTitledBorder("Content to Append"));
+        centerPanel.add(new JScrollPane(appendContentArea));
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Bottom Panel: Buttons
+        JPanel bottomPanel = new JPanel();
+        writeButton = new JButton("Write to File");
+        readButton = new JButton("Read File");
+        modifyButton = new JButton("Append to File");
+
+        bottomPanel.add(writeButton);
+        bottomPanel.add(readButton);
+        bottomPanel.add(modifyButton);
+        add(bottomPanel, BorderLayout.SOUTH);
+
+        // Action Listeners
+        writeButton.addActionListener(e -> writeFile());
+        readButton.addActionListener(e -> readFile());
+        modifyButton.addActionListener(e -> modifyFile());
+
+        setVisible(true);
     }
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            writer.write(content);
-            System.out.println("File written successfully!");
-        } catch (IOException e) {
-            System.out.println("An error occurred while writing to the file: " + e.getMessage());
-        }
-    }
 
-    // Method to read and display the contents of a text file
-    public static void readFile(String fileName) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading the file: " + e.getMessage());
-        }
-    }
+    private void writeFile() {
+        String fileName = fileNameField.getText().trim();
+        String content = fileContentArea.getText();
 
-    // Method to modify a text file by appending new content
-    public static void modifyFile(String fileName, String newContent) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
-            writer.write(newContent);
-            System.out.println("\nFile modified successfully!");
-        } catch (IOException e) {
-            System.out.println("An error occurred while modifying the file: " + e.getMessage());
-        }
-      }
-       private static boolean isValidFileName(String fileName) {
-        return fileName != null && !fileName.trim().isEmpty();
-    }
-
-    // Main method to demonstrate file operations
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("=== Welcome to the File Handling Utility ===");
-        System.out.println("This program lets you create, read, and modify text files.\n");
-        
-        // Get file name from user
-        System.out.print("Enter the name of the file you would like to work on (eg:-Example.txt): ");
-        String fileName = scanner.nextLine();
-
-        if (!isValidFileName(fileName)) {
-            System.out.println("Error: Invalid file name. Please restart the program with a valid file name.");
-            scanner.close();
+        if (fileName.isEmpty()) {
+            showMessage("Please enter a valid file name.");
             return;
         }
 
-        // Write to file
-        System.out.print("Enter the content to write to the file: ");
-        String content = scanner.nextLine();
-        writeFile(fileName, content);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            writer.write(content);
+            showMessage("File written successfully!");
+        } catch (IOException e) {
+            showMessage("Error writing to file: " + e.getMessage());
+        }
+    }
 
-        // Read the file
-        System.out.println("The content of the file is:");
-        readFile(fileName);
+    private void readFile() {
+        String fileName = fileNameField.getText().trim();
 
-        // Modify the file
-        System.out.print("\n Do you want to enter new content in the file? Enter it here: ");
-        String newContent = scanner.nextLine();
-        modifyFile(fileName, "\n" + newContent);
+        if (fileName.isEmpty()) {
+            showMessage("Please enter a valid file name.");
+            return;
+        }
 
-        // Read the modified file
-        System.out.println("The updated content of the file is:");
-        readFile(fileName);
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            fileContentArea.setText("");
+            String line;
+            while ((line = reader.readLine()) != null) {
+                fileContentArea.append(line + "\n");
+            }
+            showMessage("File read successfully!");
+        } catch (IOException e) {
+            showMessage("Error reading file: " + e.getMessage());
+        }
+    }
 
-        scanner.close();
+    private void modifyFile() {
+        String fileName = fileNameField.getText().trim();
+        String newContent = appendContentArea.getText();
+
+        if (fileName.isEmpty()) {
+            showMessage("Please enter a valid file name.");
+            return;
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, true))) {
+            writer.write("\n" + newContent);
+            showMessage("File modified successfully!");
+        } catch (IOException e) {
+            showMessage("Error modifying file: " + e.getMessage());
+        }
+    }
+
+    private void showMessage(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(FileHandlerGUI::new);
     }
 }
